@@ -7,7 +7,7 @@ Python 3.8
 Pytorch 1.7
 ```
 
-### How to run PGD attack to test your model robustness:
+### How to run PGD attack to test robustness of your model
 1. Open attack_main.py, specify how to load your model.
   A example in attack_main.py:
 ```
