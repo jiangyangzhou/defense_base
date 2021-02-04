@@ -19,6 +19,7 @@ model.load_state_dict(torch.load(args.model_path)['state_dict'], strict=False)  
 ```
 python attack_main.py --model_path=your_weight_path --gpu_id=0      #For multiple gpus, set --gpu_id=1,2,3
 ```
+It will give natural acc and robust acc for your model.
 
 ### How to train a robust model 
 Remain for you. 
