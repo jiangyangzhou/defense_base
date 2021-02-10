@@ -59,9 +59,10 @@ Include PGD attack, and others.
 1. Open attack_main.py, specify how to load your model.
   A example in attack_main.py:
 ```python
-model =  WideResNet().to(device)  # Change to your model here
+# Change to your model and specify how to load your model here
+model =  WideResNet().to(device)  
 model = nn.DataParallel(model, device_ids=[i for i in range(gpu_num)])
-model.load_state_dict(torch.load(args.model_path)['state_dict'], strict=False)   # Specify how to load your model here
+model.load_state_dict(torch.load(args.model_path)['state_dict'], strict=False)
 ```
 2. Run attack_main.py:
 ```python

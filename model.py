@@ -32,7 +32,7 @@ def get_model_for_attack(model_name, pretrained=False):
         model.load_state_dict(filter_state_dict(torch.load('models/weights/trades_wide_resnet.pt')))
     elif model_name=='model5':
         model = WideResNet()
-        model.load_state_dict(torch.load('models/weights/wideres34-10-pgdHE.pt'))
+        model.load_state_dict(filter_state_dict(torch.load('models/weights/model-wideres-pgdHE-wide10.pt')))
     elif model_name=='model6':
         model = WideResNet28()
         model.load_state_dict(filter_state_dict(torch.load('models/weights/RST-AWP_cifar10_linf_wrn28-10.pt')))
