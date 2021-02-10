@@ -4,7 +4,7 @@ import torch.nn.functional as F
 
 import torchvision
 from torchvision import datasets, transforms
-from data_utils import prepare_cifar
+from utils import prepare_cifar
 from pgd_attack import pgd_attack
 from tqdm import tqdm, trange
 

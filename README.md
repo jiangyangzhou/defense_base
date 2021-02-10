@@ -6,7 +6,7 @@ Attack and Defense API for adversarial training project for Machine Learning in 
 1. Install python
 Recomand install anaconda, see https://www.anaconda.com/products/individual#Downloads
 2. Create new environment and install pytorch, tqdm:
-```sh
+```
 conda create -n myenv python=3.8
 conda install pytorch torchvision cudatoolkit=10.2 -c pytorch
 pip install tqdm

@@ -12,7 +12,7 @@ from models import ResNet18
 from tqdm import tqdm, trange
 
 from attack_main import eval_model_pgd
-from data_utils import *
+from utils import prepare_cifar, Logger
 from eval_model import eval_model, eval_model_pgd
 
 
@@ -102,12 +102,11 @@ if __name__=="__main__":
     gpu_num = min(len(args.gpu_id.split(',')), 1)
 
     log_dir = "logs/%s_resnet18"%time.strftime("%b%d-%H%M", time.localtime())
-
     check_mkdir(log_dir)
     log = Logger(log_dir+'/train.log')
 
     device = torch.device('cuda')
-    model = ResNet18().to(device)
+    model = ResNet18().to(device)    
     model = nn.DataParallel(model, device_ids=[i for i in range(gpu_num)])
     train_loader, test_loader = prepare_cifar(args.batch_size, args.test_batch_size)
     log.print(args)

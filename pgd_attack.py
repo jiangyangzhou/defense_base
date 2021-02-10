@@ -1,7 +1,6 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from data_utils import prepare_cifar
 
 def pgd_attack(model, x, y, step_size, epsilon, perturb_steps,
                 random_start=None, distance='l_inf'):
