@@ -12,7 +12,7 @@ from model_zoo import ResNet18, ResNet34
 from tqdm import tqdm, trange
 
 from attack_main import eval_model_pgd
-from data_utils import *
+from utils import prepare_cifar, Logger
 from eval_model import eval_model, eval_model_pgd
 
 
