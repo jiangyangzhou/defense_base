@@ -12,8 +12,10 @@ from models import ResNet18
 from tqdm import tqdm, trange
 
 from attack_main import eval_model_pgd
-from loss import L2Loss, WeightConstrainLoss, PGDLoss
 from data_utils import *
+from eval_model import eval_model, eval_model_pgd
+
+
 
 
 def parse_args():
@@ -33,15 +35,13 @@ def parse_args():
     #parser.add_argument('--lr_steps', type=str, default=,
     #                help='iterations for pgd attack (default pgd20)')    
     parser.add_argument('--epoch', type=int, default=100,
-                    help='epochs for pgd training ')  
-    parser.add_argument('--epoch', type=int, default=100,
-                    help='epochs for pgd training ')  
+                    help='epochs for pgd training ')   
     parser.add_argument('--momentum', type=float, default=0.9,
                     help='iterations for pgd attack (default pgd20)')
     parser.add_argument('--weight_decay', type=float, default=5e-4,
-                    help='weight decay ratio')     
-    parser.add_argument('--delta', type=float, default=0.1,
-                    help='delta')              
+                    help='weight decay ratio')    
+    parser.add_argument('--adv_train', type=int, default=1,
+                    help='If use adversarial training')  
     #parser.add_argument('--model_path', type=str, default="./models/model-wideres-pgdHE-wide10.pt")
     parser.add_argument('--gpu_id', type=str, default="0,1")
     return parser.parse_args()
@@ -68,14 +68,13 @@ def train_adv_epoch(model, args, train_loader, device, optimizer, epoch):
             loss_sum += loss.item()
             with torch.no_grad():
                 model.eval()
-                output_adv = model(x_adv)
                 pred_adv = output_adv.argmax(dim=1)
                 pred = torch.argmax(model(x), dim=1)
                 corrects_adv += (pred_adv==y).float().sum()
                 corrects += (pred==y).float().sum()
             pbar.set_description(f"Train Epoch:{epoch}, Loss:{loss.item():.3f}, " + 
-                            f"acc:{corrects / float(data_num):.4f}, ")+
-                        #" r_acc:{corrects_adv / float(data_num):.4f}")
+                            f"acc:{corrects / float(data_num):.4f}, " +
+                        " r_acc:{corrects_adv / float(data_num):.4f}")
             pbar.update(x.shape[0])
     acc, adv_acc = corrects / float(data_num), corrects_adv / float(data_num)
     mean_loss = loss_sum / float(batch_idx+1)
@@ -99,6 +98,9 @@ def adjust_learning_rate(optimizer, epoch):
 
 if __name__=="__main__":
     args = parse_args()
+    os.environ("CUDA_VISIBLE_DEVICES") = args.gpu_id
+    gpu_num = min(len(args.gpu_id.split(',')), 1)
+
     log_dir = "logs/%s_resnet18"%time.strftime("%b%d-%H%M", time.localtime())
 
     check_mkdir(log_dir)
@@ -106,24 +108,25 @@ if __name__=="__main__":
 
     device = torch.device('cuda')
     model = ResNet18().to(device)
-    model = nn.DataParallel(model, device_ids=[0,1])
+    model = nn.DataParallel(model, device_ids=[i for i in range(gpu_num)])
     train_loader, test_loader = prepare_cifar(args.batch_size, args.test_batch_size)
     log.print(args)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
     best_epoch, best_robust_acc = 0, 0.
-    criterion_weight = WeightLoss(args.delta)
-    criterion_l2 = L2Loss(args.delta)
     for e in range(args.epoch):
         adjust_learning_rate(optimizer, e)
         train_acc, train_robust_acc, loss = train_adv_epoch(model, args, train_loader, device,  optimizer, e)
-        test_acc, test_robust_acc, _ = eval_model_pgd( model, args,  test_loader, device)
+        if e%5==0 or (e>=74 and e<=80):
+            test_acc, test_robust_acc, _ = eval_model_pgd( model,  test_loader, device, args.step_size, args.epsilon, args.perturb_steps)
+        else:
+            test_acc, _ = eval_model( model,  test_loader, device)
         if test_robust_acc > best_robust_acc:
-            best_robust_acc = test_robust_acc
-            best_epoch = e
+            best_robust_acc, best_epoch = test_robust_acc, e
         if e > 50:
-            torch.save(model.module.state_dict(),
-                       os.path.join(log_dir, f"resnet18-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
+            torch.save(model.module.state_dict(),  
+             os.path.join(log_dir, f"resnet18-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
         log.print(f"Epoch:{e}, loss:{loss:.5f}, train_acc:{train_acc:.4f}, train_rubust_acc:{train_robust_acc:.4f},  " + 
-                f"test_acc:{test_acc:.4f}, test_rubust_acc:{test_robust_acc:.4f}, best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}.")
+                            f"test_acc:{test_acc:.4f}, test_rubust_acc:{test_robust_acc:.4f}, 
+                            best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}.")
     torch.save(model.module.state_dict(), f"{log_dir}/resnet18_e{args.epoch - 1}_{test_acc:.4f}_{test_robust_acc:.4f}-final.pt")
         
