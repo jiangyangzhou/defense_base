@@ -87,3 +87,13 @@ It will give natural acc and robust acc for your model.
 
 ### How to train a robust model 
 See pgd_train.py 
+
+### 代码提交规范
+你需要提供模型的训练，推理方法和模型weight。请参考本repo提供defense model的方法。提交的代码包必须包含:
+```
+train.py   # python train.py 可直接复现你的模型训练过程
+infer.py   # python inter.py  可直接测试 cifar10 test acc，给出natural acc.
+attack.py  # python attack.py 运行攻击你的模型， 请参考attack_main.py 把被攻击模型换成你的。
+your_model_name.pth  #你训练的模型weight
+```
+将以上文件打包压缩提交
