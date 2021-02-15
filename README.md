@@ -37,7 +37,22 @@ Step2, move model weights to path `models/weights/`
 Run model: see `get_model_for_attack` in model.py  
 
 #### Attack Baseline
-See pgd_attack.py and attack_main.py for PGD attack baseline code
+See PGDAttack class in pgd_attack.py for PGD attack baseline code.
+You can modify attack function in attack_main.py to your attack class.
+
+#### 代码提交规范
+你需要像pgd_attack.py 里的PGDAttack class一样实现一个攻击类。 类似：
+```python
+attack = PGDAttack(args.step_size, args.epsilon, args.perturb_steps)
+```
+然后可以通过这样调用攻击算法,生成对抗样本：
+```python
+x_adv = attack(model, x, label)
+```
+最后，我们会使用 `eval_model_with_attack` in eval_model.py 来测试你的攻击算法。
+```python
+natural_acc, robust_acc, distance = eval_model_with_attack(model, test_loader, attack, device)
+```
 
 #### Test your attack
 See attack_main.py, and replace pgd_attack method to your own attack method.  

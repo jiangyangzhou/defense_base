@@ -144,4 +144,5 @@ test.py
 data/
 logs/
 weights/
+model_zoo/
 test.py
