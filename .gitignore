@@ -144,3 +144,4 @@ test.py
 data/
 logs/
 weights/
+test.py

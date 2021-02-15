@@ -37,6 +37,14 @@ class Logger:
         print(content,end=end)
 
 
+def get_test_cifar(batch_size):
+    transform_test = transforms.Compose([
+            transforms.ToTensor(),
+            ])
+    testset = torchvision.datasets.CIFAR10(root='./data', train=False, download=True, transform=transform_test)
+    test_loader = torch.utils.data.DataLoader(testset, batch_size=batch_size, shuffle=False)
+    return test_loader
+
 def prepare_cifar(batch_size, test_batch_size):
     kwargs = {'num_workers': 8, 'pin_memory': True}
     transform_train = transforms.Compose([
