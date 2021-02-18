@@ -142,7 +142,7 @@ if __name__=="__main__":
             torch.save(model.module.state_dict(),  
              os.path.join(log_dir, f"resnet34-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
         log.print(f"Epoch:{e}, loss:{loss:.5f}, train_acc:{train_acc:.4f}, " + 
-                            f"test_acc:{test_acc:.4f}, test_rubust_acc:{test_robust_acc:.4f}, " +
+                            f"test_acc:{test_acc:.4f}, test_robust_acc:{test_robust_acc:.4f}, " +
                             f"best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}.")
     torch.save(model.module.state_dict(), f"{log_dir}/resnet34_e{args.epoch - 1}_{test_acc:.4f}_{test_robust_acc:.4f}-final.pt")
         

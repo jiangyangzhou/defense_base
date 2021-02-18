@@ -12,7 +12,7 @@ from models import ResNet18
 from tqdm import tqdm, trange
 
 from attack_main import eval_model_pgd
-from utils import prepare_cifar, Logger
+from utils import prepare_cifar, Logger, check_mkdir
 from eval_model import eval_model, eval_model_pgd
 
 
@@ -74,7 +74,7 @@ def train_adv_epoch(model, args, train_loader, device, optimizer, epoch):
                 corrects += (pred==y).float().sum()
             pbar.set_description(f"Train Epoch:{epoch}, Loss:{loss.item():.3f}, " + 
                             f"acc:{corrects / float(data_num):.4f}, " +
-                        " r_acc:{corrects_adv / float(data_num):.4f}")
+                        f"r_acc:{corrects_adv / float(data_num):.4f}")
             pbar.update(x.shape[0])
     acc, adv_acc = corrects / float(data_num), corrects_adv / float(data_num)
     mean_loss = loss_sum / float(batch_idx+1)
@@ -98,7 +98,7 @@ def adjust_learning_rate(optimizer, epoch):
 
 if __name__=="__main__":
     args = parse_args()
-    os.environ("CUDA_VISIBLE_DEVICES") = args.gpu_id
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
     gpu_num = min(len(args.gpu_id.split(',')), 1)
 
     log_dir = "logs/%s_resnet18"%time.strftime("%b%d-%H%M", time.localtime())
@@ -124,8 +124,8 @@ if __name__=="__main__":
         if e > 50:
             torch.save(model.module.state_dict(),  
              os.path.join(log_dir, f"resnet18-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
-        log.print(f"Epoch:{e}, loss:{loss:.5f}, train_acc:{train_acc:.4f}, train_rubust_acc:{train_robust_acc:.4f},  " + 
-                            f"test_acc:{test_acc:.4f}, test_rubust_acc:{test_robust_acc:.4f}, " +
+        log.print(f"Epoch:{e}, loss:{loss:.5f}, train_acc:{train_acc:.4f}, train_robust_acc:{train_robust_acc:.4f},  " + 
+                            f"test_acc:{test_acc:.4f}, test_robust_acc:{test_robust_acc:.4f}, " +
                             f"best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}.")
     torch.save(model.module.state_dict(), f"{log_dir}/resnet18_e{args.epoch - 1}_{test_acc:.4f}_{test_robust_acc:.4f}-final.pt")
         
