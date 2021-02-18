@@ -18,7 +18,7 @@ def parse_args():
     parser.add_argument('--batch-size', type=int, default=256, metavar='N',
                     help='input batch size for training (default: 128)')
     parser.add_argument('--step_size', type=int, default=0.003,
-                    help='step size for pgd attack(default:0.03)')
+                    help='step size for pgd attack(default:0.003)')
     parser.add_argument('--epsilon', type=float, default=8/255.0,
                     help='max distance for pgd attack (default epsilon=8/255)')
     parser.add_argument('--perturb_steps', type=int, default=20,
