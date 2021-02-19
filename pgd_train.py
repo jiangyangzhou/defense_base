@@ -99,7 +99,7 @@ def adjust_learning_rate(optimizer, epoch):
 if __name__=="__main__":
     args = parse_args()
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
-    gpu_num = min(len(args.gpu_id.split(',')), 1)
+    gpu_num = max(len(args.gpu_id.split(',')), 1)
 
     log_dir = "logs/%s_resnet18"%time.strftime("%b%d-%H%M", time.localtime())
     check_mkdir(log_dir)
