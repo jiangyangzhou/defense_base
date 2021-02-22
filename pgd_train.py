@@ -101,21 +101,24 @@ if __name__=="__main__":
     os.environ["CUDA_VISIBLE_DEVICES"] = args.gpu_id
     gpu_num = max(len(args.gpu_id.split(',')), 1)
 
-    log_dir = "logs/%s_resnet18"%time.strftime("%b%d-%H%M", time.localtime())
+    model_name = 'resnet18'
+    log_dir = "logs/%s_%s" % (time.strftime("%b%d-%H%M", time.localtime()), model_name)
     check_mkdir(log_dir)
     log = Logger(log_dir+'/train.log')
+    log.print(args)
 
     device = torch.device('cuda')
     model = ResNet18().to(device)    
     model = nn.DataParallel(model, device_ids=[i for i in range(gpu_num)])
+
     train_loader, test_loader = prepare_cifar(args.batch_size, args.test_batch_size)
-    log.print(args)
     optimizer = optim.SGD(model.parameters(), lr=args.lr, momentum=args.momentum, weight_decay=args.weight_decay)
+
     best_epoch, best_robust_acc = 0, 0.
     for e in range(args.epoch):
         adjust_learning_rate(optimizer, e)
         train_acc, train_robust_acc, loss = train_adv_epoch(model, args, train_loader, device,  optimizer, e)
-        if e%5==0 or (e>=74 and e<=80):
+        if e%3==0 or (e>=74 and e<=80):
             test_acc, test_robust_acc, _ = eval_model_pgd( model,  test_loader, device, args.step_size, args.epsilon, args.perturb_steps)
         else:
             test_acc, _ = eval_model( model,  test_loader, device)
@@ -123,9 +126,9 @@ if __name__=="__main__":
             best_robust_acc, best_epoch = test_robust_acc, e
         if e > 50:
             torch.save(model.module.state_dict(),  
-             os.path.join(log_dir, f"resnet18-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
+             os.path.join(log_dir, f"{model_name}-e{e}-{test_acc:.4f}_{test_robust_acc:.4f}-best.pt"))
         log.print(f"Epoch:{e}, loss:{loss:.5f}, train_acc:{train_acc:.4f}, train_robust_acc:{train_robust_acc:.4f},  " + 
                             f"test_acc:{test_acc:.4f}, test_robust_acc:{test_robust_acc:.4f}, " +
-                            f"best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}.")
-    torch.save(model.module.state_dict(), f"{log_dir}/resnet18_e{args.epoch - 1}_{test_acc:.4f}_{test_robust_acc:.4f}-final.pt")
+                            f"best_robust_acc:{best_robust_acc:.4f} in epoch {best_epoch}." )
+    torch.save(model.module.state_dict(), f"{log_dir}/{model_name}_e{args.epoch - 1}_{test_acc:.4f}_{test_robust_acc:.4f}-final.pt")
         
