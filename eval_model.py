@@ -63,7 +63,7 @@ def eval_model_with_attack(model,  test_loader,attack, device):
         for x, label in test_loader:
             x, label = x.to(device), label.to(device)
             batch, c, h, w = x.shape
-            x_adv = attack(model, x, label)
+            x_adv = attack(model, x.clone(), label.clone())
             model.eval()
             with torch.no_grad():
                 output = model(x)
