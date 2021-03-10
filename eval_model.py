@@ -37,7 +37,7 @@ def eval_model_pgd(model,  test_loader, device, step_size, epsilon, perturb_step
         for x, label in test_loader:
             x, label = x.to(device), label.to(device)
             batch, c, h, w = x.shape
-            x_adv = pgd_attack(model, x, label, step_size, epsilon, perturb_steps)
+            x_adv = pgd_attack(model, x.clone(), label.clone(), step_size, epsilon, perturb_steps)
             model.eval()
             with torch.no_grad():
                 output = model(x)
