@@ -37,11 +37,11 @@ Step1, download model weights here [Jbox](https://jbox.sjtu.edu.cn/l/PFOOnZ)
 Step2, move model weights to path `models/weights/`  
 Run model: see `get_model_for_attack` in model.py  
 
-#### Attack Baseline
+### Attack Baseline
 See PGDAttack class in pgd_attack.py for PGD attack baseline code.  
 You can modify attack function in attack_main.py to your attack class.  
 
-#### 代码提交规范
+### 代码提交规范
 你需要像pgd_attack.py 里的PGDAttack class一样实现一个攻击类。 类似： 
 ```python
 attack = PGDAttack(args.step_size, args.epsilon, args.perturb_steps)
@@ -55,7 +55,7 @@ x_adv = attack(model, x, label)
 natural_acc, robust_acc, distance = eval_model_with_attack(model, test_loader, attack, device)
 ```
 
-#### Test your attack
+### Test your attack
 See attack_main.py, and replace pgd_attack method to your own attack method.   
 And run attack_main.py to test your attack, set model_name to [model1, model2, model3, model4, model5, model6]. Like:  
 ```sh
@@ -71,7 +71,7 @@ In this task, you need to train a robust model under l-inf attack(8/255) on CIFA
 We'll use various attack methods to evaluate the robustness of your model.   
 Include PGD attack, and others.  
 
-#### How to run PGD attack to test robustness of your model
+### How to run PGD attack to test robustness of your model
 1. Open attack_main.py, specify how to load your model.  
   A example in attack_main.py:
 ```python
