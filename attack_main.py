@@ -15,7 +15,7 @@ import os
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Test Robust Accuracy')
-    parser.add_argument('--batch-size', type=int, default=256, metavar='N',
+    parser.add_argument('--batch-size', type=int, default=128, metavar='N',
                     help='input batch size for training (default: 128)')
     parser.add_argument('--step_size', type=int, default=0.003,
                     help='step size for pgd attack(default:0.003)')
@@ -25,7 +25,7 @@ def parse_args():
                     help='iterations for pgd attack (default pgd20)')
     parser.add_argument('--model_name', type=str, default="")
     parser.add_argument('--model_path', type=str, default="./models/weights/model-wideres-pgdHE-wide10.pt")
-    parser.add_argument('--gpu_id', type=str, default="0,1")
+    parser.add_argument('--gpu_id', type=str, default="0")
     return parser.parse_args()
 
 
