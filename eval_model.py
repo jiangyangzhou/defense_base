@@ -55,7 +55,7 @@ def eval_model_pgd(model,  test_loader, device, step_size, epsilon, perturb_step
     distance = torch.cat(distance).max()
     return natural_acc, robust_acc, distance
 
-def eval_model_with_attack(model,  test_loader,attack, device):
+def eval_model_with_attack(model,  test_loader, attack, epsilon, device):
     correct_adv, correct = [], []
     distance = []
     num = 0
@@ -64,6 +64,8 @@ def eval_model_with_attack(model,  test_loader,attack, device):
             x, label = x.to(device), label.to(device)
             batch, c, h, w = x.shape
             x_adv = attack(model, x.clone(), label.clone())
+            x_adv = torch.min(torch.max(x_adv, x - epsilon), x + epsilon)
+            x_adv = x_adv.clamp(0,1)
             model.eval()
             with torch.no_grad():
                 output = model(x)
