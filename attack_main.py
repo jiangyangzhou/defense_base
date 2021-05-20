@@ -49,5 +49,5 @@ if __name__=='__main__':
     attack = PGDAttack(args.step_size, args.epsilon, args.perturb_steps)
     model.eval()
     test_loader = get_test_cifar(args.batch_size)
-    natural_acc, robust_acc, distance = eval_model_with_attack(model, test_loader, attack, device)
+    natural_acc, robust_acc, distance = eval_model_with_attack(model, test_loader, attack, args.epsilon, device)
     print(f"Natural Acc: {natural_acc:.5f}, Robust acc: {robust_acc:.5f}, distance:{distance:.5f}")
